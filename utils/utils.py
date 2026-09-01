@@ -1,4 +1,7 @@
 import random
+from datetime import datetime, timezone
+
+from fastapi import HTTPException
 
 def get_random_character(string_array):
   random_number_to_get_string = random.randint(0, len(string_array) - 1)
@@ -29,5 +32,3 @@ def generate_short_code():
       short_code_to_return += character
   
   return short_code_to_return
-
-print(generate_short_code())

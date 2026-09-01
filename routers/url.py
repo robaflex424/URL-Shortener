@@ -3,9 +3,18 @@ from time import timezone
 from typing import Annotated
 from sqlalchemy.orm import Session 
 from database.database import get_db
-from schemas.url import URLCreate, URLResponse 
-from fastapi import APIRouter, Depends, HTTPException
-from utils.utils import generate_short_code
+from schemas.url import (
+  URLCreate, 
+  URLResponse
+  ) 
+from fastapi import (
+  APIRouter, 
+  Depends, 
+  HTTPException
+  )
+from utils.utils import (
+  generate_short_code
+  )
 from models.url import Url
 from fastapi.responses import RedirectResponse
 
@@ -39,8 +48,8 @@ async def create_url(db: db_dependency, url: URLCreate):
 
   return new_url
 
-@redirect_router.get("{short_code}")
-async def redirect_user_to_url(short_code: str, db: db_dependency):
+@redirect_router.get("{short_code}", response_model=URLResponse)
+async def redirect_user_to_url(db: db_dependency, short_code: str):
   url = db.query(Url).filter(Url.short_code == short_code).first()
 
   if url is None:
@@ -69,3 +78,27 @@ async def redirect_user_to_url(short_code: str, db: db_dependency):
     url=url.original_url,
     status_code=307
   )
+
+@url_router.get("/{short_code}", response_model=URLResponse)
+async def return_url_information(db: db_dependency, short_code: str):
+  url = db.query(Url).filter(Url.short_code == short_code).first()
+
+  if url is None:
+    raise HTTPException(
+      status_code=404,
+      detail="URL not found"
+    )
+
+  if url.is_active is False: 
+    raise HTTPException(
+      status_code=404,
+      detail="URL is inactive"
+    )
+  
+  if url.expires_at is not None and url.expires_at <= datetime.now(timezone.utc):
+    raise HTTPException(
+      status_code=404,
+      detail="URL is expired"
+    )  
+
+  return url
