@@ -24,7 +24,7 @@ def generate_short_code():
 
   short_code_to_return = ""
 
-  length_of_short_code = 7
+  length_of_short_code = 6
 
 
   for n in range(length_of_short_code):

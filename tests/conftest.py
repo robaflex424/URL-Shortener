@@ -15,7 +15,7 @@ engine = create_engine(
   connect_args={
     "check_same_thread": False
   },
-  pool=StaticPool
+  poolclass=StaticPool
 )
 
 TestingSessionLocal = sessionmaker(
@@ -41,7 +41,7 @@ def client(db):
   def override_get_db():
     yield db 
   
-  app.dependency_overrides(get_db) = override_get_db
+  app.dependency_overrides[get_db] = override_get_db
 
   with TestClient(app) as client: 
     yield client 
