@@ -29,7 +29,7 @@ redirect_router = APIRouter(
 
 db_dependency = Annotated[Session, Depends(get_db)]
 
-@url_router.post("", response_model=URLResponse)
+@url_router.post("", response_model=URLResponse, status_code=201)
 async def create_url(db: db_dependency, url: URLCreate):
   short_code = generate_short_code()
 
@@ -79,7 +79,7 @@ async def redirect_user_to_url(db: db_dependency, short_code: str):
     status_code=307
   )
 
-@url_router.get("/{short_code}", response_model=URLResponse)
+@url_router.get("/{short_code}", response_model=URLResponse, status_code=200)
 async def return_url_information(db: db_dependency, short_code: str):
   url = db.query(Url).filter(Url.short_code == short_code).first()
 
@@ -102,3 +102,28 @@ async def return_url_information(db: db_dependency, short_code: str):
     )  
 
   return url
+
+@url_router.delete("/{short_code}", status_code=204)
+async def delete_url(short_code: str, db: db_dependency):
+  url = db.query(Url).filter(Url.short_code == short_code).first()
+
+  if url is None:
+    raise HTTPException(
+      status_code=404,
+      detail="URL not found"
+    ) 
+  
+  if url.is_active is False:
+    raise HTTPException(
+      status_code=404,
+      detail="URL is inactive"
+    )
+  
+  if url.expires_at is not None and url.expires_at <= datetime.now(timezone.utc):
+    raise HTTPException(
+      status_code=404,
+      detail="URL is expired"
+    )    
+  
+  db.delete(url)
+  db.commit()
