@@ -50,7 +50,7 @@ async def create_url(db: db_dependency, url: URLCreate):
 
   return new_url
 
-@redirect_router.get("{short_code}", response_model=URLResponse)
+@redirect_router.get("/{short_code}", response_model=URLResponse)
 async def redirect_user_to_url(db: db_dependency, short_code: str):
   url = db.query(Url).filter(Url.short_code == short_code).first()
 
