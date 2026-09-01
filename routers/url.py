@@ -6,6 +6,7 @@ from database.database import get_db
 from schemas.url import (
   URLCreate, 
   URLResponse,
+  URLStats,
   URLUpdate
   ) 
 from fastapi import (
@@ -151,4 +152,16 @@ async def update_url_by_short_code(db: db_dependency, short_code: str, update_ur
   db.commit()
   db.refresh(url)
 
+  return url
+
+@url_router.get("/{short_code}/stats", response_model=URLStats)
+async def get_url_stats(db: db_dependency, short_code: int):
+  url = db.query(Url).filter(Url.short_code == short_code).first()
+
+  if url is None: 
+    raise HTTPException(
+      status_code=404,
+      detail="URL not found"
+    )
+  
   return url

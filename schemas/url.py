@@ -18,3 +18,11 @@ class URLUpdate(BaseModel):
   original_url: HttpUrl | None = None 
   expires_at: datetime | None 
   is_active: bool | None = None
+
+class URLStats(BaseModel):
+  original_url: HttpUrl
+  short_code: str 
+  created_at: datetime
+  expires_at: datetime 
+  click_count: int 
+  is_active: bool
