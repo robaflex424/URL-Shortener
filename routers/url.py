@@ -5,7 +5,8 @@ from sqlalchemy.orm import Session
 from database.database import get_db
 from schemas.url import (
   URLCreate, 
-  URLResponse
+  URLResponse,
+  URLUpdate
   ) 
 from fastapi import (
   APIRouter, 
@@ -104,7 +105,7 @@ async def return_url_information(db: db_dependency, short_code: str):
   return url
 
 @url_router.delete("/{short_code}", status_code=204)
-async def delete_url(short_code: str, db: db_dependency):
+async def delete_url_by_short_code(short_code: str, db: db_dependency):
   url = db.query(Url).filter(Url.short_code == short_code).first()
 
   if url is None:
@@ -127,3 +128,27 @@ async def delete_url(short_code: str, db: db_dependency):
   
   db.delete(url)
   db.commit()
+
+@url_router.put("{short_code}", response_model=URLResponse, status_code=200)
+async def update_url_by_short_code(db: db_dependency, short_code: str, update_url: URLUpdate, url):
+  url = db.query(Url).filter(Url.short_code == short_code).first()
+
+  if url is None:
+    raise HTTPException(
+      status_code=404,
+      detail="URL not found"
+    )
+    
+  if update_url.original_url is not None:
+    url.original_url == str(update_url.original_url)
+
+  if update_url.expires_at is not None:
+    url.expires_at == str(update_url.expires_at)
+  
+  if update_url.is_active is not None:
+    url.is_active == str(update_url.is_active)
+  
+  db.commit()
+  db.refresh(url)
+
+  return url

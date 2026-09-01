@@ -13,4 +13,8 @@ class URLResponse(BaseModel):
   expires_at: datetime | None 
   click_count: int 
   is_active: bool 
-  
+
+class URLUpdate(BaseModel):
+  original_url: HttpUrl | None = None 
+  expires_at: datetime | None 
+  is_active: bool | None = None
