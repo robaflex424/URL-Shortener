@@ -50,3 +50,11 @@ def test_getting_nonexistent_url(client):
   )
 
   assert response.status_code == 404
+
+def test_missing_url(client):
+  response = client.post(
+    "/urls",
+    json={}
+  )
+  
+  assert response.status_code == 422
