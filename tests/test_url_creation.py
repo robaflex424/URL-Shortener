@@ -43,3 +43,10 @@ def test_redirecting_url(client):
   )
 
   assert response.status_code == 307
+
+def test_getting_nonexistent_url(client):
+  response = client.get(
+    "/urls/AKRP35"
+  )
+
+  assert response.status_code == 404
