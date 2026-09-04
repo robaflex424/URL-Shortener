@@ -1,3 +1,5 @@
+from datetime import datetime, timezone, timedelta
+
 def test_url_creation(client):
   response = client.post(
     "/urls",
@@ -58,3 +60,23 @@ def test_missing_url(client):
   )
   
   assert response.status_code == 422
+
+def test_generated_short_code(client):
+  create_response = client.post(
+    "/urls",
+    json={
+      "original_url": "https://facebook.com/"
+    }
+  )
+
+  short_code = create_response.json()["short_code"]
+
+  short_url_response = client.get(
+    f"/{short_code}",
+    follow_redirects=False
+  )
+
+  assert short_url_response is not None 
+  assert short_url_response.status_code == 307
+  assert short_url_response.json()["original_url"] == "https://facebook.com/"
+
