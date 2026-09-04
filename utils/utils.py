@@ -18,9 +18,8 @@ def generate_short_code():
   alphabet = "abcdefghijklmnopqrstuvwxyz"
   alphabet_upper = alphabet.upper()
   numbers = "0123456789"
-  symbols = "!@#$%^&*()-_+="
 
-  multi_string_array = [alphabet, alphabet_upper, numbers, symbols]
+  multi_string_array = [alphabet, alphabet_upper, numbers]
 
   short_code_to_return = ""
 

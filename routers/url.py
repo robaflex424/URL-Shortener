@@ -1,5 +1,4 @@
-import datetime
-from time import timezone
+from datetime import datetime, timezone
 from typing import Annotated
 from sqlalchemy.orm import Session 
 from database.database import get_db
@@ -66,6 +65,9 @@ async def redirect_user_to_url(db: db_dependency, short_code: str):
       detail="URL is inactive"
     )
   
+  if url.expires_at is not None and url.expires_at.tzinfo is None:
+    url.expires_at = url.expires_at.replace(tzinfo=timezone.utc)
+
   if url.expires_at is not None and url.expires_at <= datetime.now(timezone.utc):
     raise HTTPException(
       status_code=404,
