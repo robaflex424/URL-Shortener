@@ -108,8 +108,13 @@ async def return_url_information(db: db_dependency, short_code: str):
   return url
 
 @url_router.delete("/{short_code}", status_code=204)
-async def delete_url_by_short_code(short_code: str, db: db_dependency):
-  url = db.query(Url).filter(Url.short_code == short_code).first()
+async def delete_url_by_short_code(
+  db: db_dependency, 
+  short_code: str
+  ):
+  url = db.query(Url).filter(
+    Url.short_code == short_code
+  ).first()
 
   if url is None:
     raise HTTPException(
@@ -132,9 +137,15 @@ async def delete_url_by_short_code(short_code: str, db: db_dependency):
   db.delete(url)
   db.commit()
 
-@url_router.put("{short_code}", response_model=URLResponse, status_code=200)
-async def update_url_by_short_code(db: db_dependency, short_code: str, update_url: URLUpdate, url):
-  url = db.query(Url).filter(Url.short_code == short_code).first()
+@url_router.put("/{short_code}", response_model=URLResponse, status_code=200)
+async def update_url_by_short_code(
+  db: db_dependency, 
+  short_code: str, 
+  update_url: URLUpdate
+  ):
+  url = db.query(Url).filter(
+    Url.short_code == short_code
+  ).first()
 
   if url is None:
     raise HTTPException(
@@ -143,13 +154,13 @@ async def update_url_by_short_code(db: db_dependency, short_code: str, update_ur
     )
     
   if update_url.original_url is not None:
-    url.original_url == str(update_url.original_url)
+    url.original_url = str(update_url.original_url)
 
   if update_url.expires_at is not None:
-    url.expires_at == str(update_url.expires_at)
+    url.expires_at = update_url.expires_at
   
   if update_url.is_active is not None:
-    url.is_active == str(update_url.is_active)
+    url.is_active = update_url.is_active
   
   db.commit()
   db.refresh(url)
@@ -157,8 +168,13 @@ async def update_url_by_short_code(db: db_dependency, short_code: str, update_ur
   return url
 
 @url_router.get("/{short_code}/stats", response_model=URLStats)
-async def get_url_stats(db: db_dependency, short_code: int):
-  url = db.query(Url).filter(Url.short_code == short_code).first()
+async def get_url_stats(
+  db: db_dependency, 
+  short_code: int
+  ):
+  url = db.query(Url).filter(
+    Url.short_code == short_code
+  ).first()
 
   if url is None: 
     raise HTTPException(

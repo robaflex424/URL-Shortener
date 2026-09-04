@@ -16,7 +16,7 @@ class URLResponse(BaseModel):
 
 class URLUpdate(BaseModel):
   original_url: HttpUrl | None = None 
-  expires_at: datetime | None 
+  expires_at: datetime | None = None
   is_active: bool | None = None
 
 class URLStats(BaseModel):

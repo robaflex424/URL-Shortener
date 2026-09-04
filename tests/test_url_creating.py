@@ -240,11 +240,13 @@ def test_updating_url(client, db):
   assert url.original_url == "https://facebook.com/"
 
   update_response = client.put(
-    f"/{short_code}",
+    f"/urls/{short_code}",
     json={
-      "update_url": "https://learnx.ge/"
+      "original_url": "https://learnx.ge/"
     }
   )
+
+  print(update_response.json())
 
   assert update_response.status_code == 200
 
@@ -253,4 +255,30 @@ def test_updating_url(client, db):
 
   updated_url = db.query(Url).filter(Url.short_code == updated_short_code).first() 
 
-  assert updated_url.original_url == "https://learx.ge/"
+  assert updated_url.original_url == "https://learnx.ge/"
+
+def test_deleting_url(client):
+  create_response = client.post(
+    "/urls",
+    json={
+      "original_url": "https://facebook.com/"
+    }
+  )
+  
+  assert create_response.status_code == 201
+  
+  data = create_response.json()
+  short_code = data["short_code"]  
+
+  delete_response = client.delete(
+    f"/urls/{short_code}"
+  )
+  
+  assert delete_response.status_code == 204 
+
+  response = client.get(
+    f"/urls/{short_code}"
+  )
+
+  assert response.status_code == 404 
+  assert response.json()["detail"] == "URL not found"
