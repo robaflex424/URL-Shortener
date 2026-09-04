@@ -201,3 +201,23 @@ def test_click_count_increases(client, db):
   
   assert response2.status_code == 307
   assert url.click_count == 2
+
+
+# ----------   TEST   URL MANAGEMENT   ----------
+
+def test_retrieving_url(client, db):
+  create_response = client.post(
+    "/urls",
+    json={
+      "original_url": "https://facebook.com/"
+    }
+  )
+  
+  assert create_response.status_code == 201
+  
+  data = create_response.json()
+  short_code = data["short_code"]
+
+  url = db.query(Url).filter(Url.short_code == short_code).first() 
+
+  assert url.original_url == "https://facebook.com/"
