@@ -221,3 +221,36 @@ def test_retrieving_url(client, db):
   url = db.query(Url).filter(Url.short_code == short_code).first() 
 
   assert url.original_url == "https://facebook.com/"
+
+def test_updating_url(client, db):
+  create_response = client.post(
+    "/urls",
+    json={
+      "original_url": "https://facebook.com/"
+    }
+  )
+  
+  assert create_response.status_code == 201
+  
+  data = create_response.json()
+  short_code = data["short_code"]  
+
+  url = db.query(Url).filter(Url.short_code == short_code).first()
+  
+  assert url.original_url == "https://facebook.com/"
+
+  update_response = client.put(
+    f"/{short_code}",
+    json={
+      "update_url": "https://learnx.ge/"
+    }
+  )
+
+  assert update_response.status_code == 200
+
+  updated_data = update_response.json()
+  updated_short_code = updated_data["short_code"]
+
+  updated_url = db.query(Url).filter(Url.short_code == updated_short_code).first() 
+
+  assert updated_url.original_url == "https://learx.ge/"
